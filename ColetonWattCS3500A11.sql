@@ -152,7 +152,7 @@ ORDER BY Vendor.Name;
 
 /*6. Display the territory (Territory ID, Name, CountryRegionCode, Group and Number of Customers) of the 
 sales territory that has the most customers. (Hint: Number of customers is over 4000*/
-SELECT SalesTerritory.TerritoryID, SalesTerritory.Name, CountryRegion.Name, SalesTerritory.[Group], COUNT(*) AS 'Number of Customers'
+SELECT SalesTerritory.TerritoryID, SalesTerritory.Name AS TerritoryName, CountryRegion.CountryRegionCode, SalesTerritory.[Group], COUNT(*) AS 'Number of Customers'
 
 FROM Sales.Customer
 INNER JOIN Sales.SalesTerritory
@@ -160,7 +160,7 @@ ON Sales.Customer.TerritoryID = Sales.SalesTerritory.TerritoryID
 INNER JOIN Person.CountryRegion
 ON Sales.SalesTerritory.CountryRegionCode = Person.CountryRegion.CountryRegionCode	
 
-GROUP BY SalesTerritory.TerritoryID, SalesTerritory.Name, CountryRegion.Name, SalesTerritory.[Group]
+GROUP BY SalesTerritory.TerritoryID, SalesTerritory.Name, CountryRegion.CountryRegionCode, SalesTerritory.[Group]
 HAVING COUNT(*) =
 (
 	SELECT MAX(CustomerCount)
@@ -173,7 +173,7 @@ HAVING COUNT(*) =
 		INNER JOIN Person.CountryRegion
 		ON Sales.SalesTerritory.CountryRegionCode = Person.CountryRegion.CountryRegionCode	
 		
-		GROUP BY SalesTerritory.TerritoryID, SalesTerritory.Name, CountryRegion.Name, SalesTerritory.[Group]
+		GROUP BY SalesTerritory.TerritoryID, SalesTerritory.Name, CountryRegion.CountryRegionCode, SalesTerritory.[Group]
 	) t1
 );
 
@@ -226,7 +226,9 @@ WHERE SalesYTD >
 (
 	SELECT AVG(SalesYTD)
 	FROM Sales.SalesPerson
-);
+)
+
+ORDER BY Person.LastName, Person.FirstName;
 
 
 /*9. Identify the currency of the foreign country (not the US) with the highest total number of orders.
@@ -265,7 +267,7 @@ Sale Reason Name
 discounted price of the item (unit price minus the discount applied against the unit price) 
 for this items On Promotion where the Special Offer Description begins with Touring. (Hint: 33 rows)*/
 
-SELECT SalesReason.Name, SalesOrderDetail.UnitPrice, Product.Name, SpecialOffer.Description, SpecialOffer.DiscountPct, ROUND((SalesOrderDetail.UnitPrice * (1 - SpecialOffer.DiscountPct)), 2) AS 'Discounted Price'
+SELECT SalesReason.Name AS 'Sale Reason', SalesOrderDetail.UnitPrice, Product.Name AS ProductName, SpecialOffer.Description, SpecialOffer.DiscountPct, ROUND((SalesOrderDetail.UnitPrice * (1 - SpecialOffer.DiscountPct)), 2) AS 'Discounted Price'
 FROM Production.Product
 INNER JOIN Sales.SpecialOfferProduct
 ON Sales.SpecialOfferProduct.ProductID = Production.Product.ProductID	
@@ -285,4 +287,3 @@ WHERE SpecialOffer.Description LIKE 'Touring%'
 AND SalesReason.Name = 'On Promotion'
 
 ORDER BY Product.Name;
-
